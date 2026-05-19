@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import {
   getTodayHabits,
   completeHabitToday,
+  createHabit,
 } from "../services/habitService";
 
 type Habit = {
@@ -18,6 +19,8 @@ type Habit = {
 export default function DashboardPage() {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [loading, setLoading] = useState(true);
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
 
   useEffect(() => {
     async function loadHabits() {
@@ -48,9 +51,50 @@ export default function DashboardPage() {
     }
   }
 
+  async function handleCreateHabit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    try {
+      await createHabit(name, description, "daily");
+
+      const updatedHabits = await getTodayHabits();
+
+      setHabits(updatedHabits);
+      setName("");
+      setDescription("");
+
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   return (
     <main>
       <h1>Dashboard</h1>
+
+      <form onSubmit={handleCreateHabit}>
+        <div>
+          <input
+            type="text"
+            placeholder="Nombre del hábito"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+          />
+        </div>
+
+        <div>
+          <input
+            type="text"
+            placeholder="Descripción"
+            value={description}
+            onChange={(event) => setDescription(event.target.value)}
+          />
+        </div>
+
+        <button type="submit">
+          Crear hábito
+        </button>
+      </form>
 
       {habits.length === 0 ? (
         <p>No tienes hábitos registrados.</p>

@@ -9,3 +9,13 @@ export async function completeHabitToday(habitId: number) {
   const response = await api.post(`/habits/${habitId}/complete-today`);
   return response.data;
 }
+
+export async function createHabit(name: string, description: string, frequency: string) {
+  const response = await api.post("/habits", {
+    name,
+    description,
+    frequency,
+  });
+
+  return response.data;
+}
