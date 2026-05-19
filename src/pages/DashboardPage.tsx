@@ -7,7 +7,15 @@ import {
   createHabit,
 } from "../services/habitService";
 
+import { getCurrentUser } from "../services/userService";
 import "../App.css";
+
+
+type User = {
+  id: number;
+  name: string;
+  email: string;
+};
 
 type Habit = {
   id: number;
@@ -22,6 +30,7 @@ type Habit = {
 export default function DashboardPage() {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const navigate = useNavigate();
@@ -29,6 +38,8 @@ export default function DashboardPage() {
   useEffect(() => {
     async function loadHabits() {
       try {
+        const currentUser = await getCurrentUser();
+        setUser(currentUser);
         const data = await getTodayHabits();
         setHabits(data);
       } catch (error) {
@@ -81,7 +92,7 @@ export default function DashboardPage() {
     <main className="app-page">
       <section className="dashboard-container">
         <div className="dashboard-header">
-          <h1 className="page-title">Dashboard</h1>
+          <h1 className="page-title">Hola, {user?.name ?? "usuario"} 👋</h1>
 
           <button className="secondary-button" onClick={handleLogout}>
             Cerrar sesión
