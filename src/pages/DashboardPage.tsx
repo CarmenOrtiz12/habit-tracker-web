@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import {
   getTodayHabits,
@@ -23,6 +24,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function loadHabits() {
@@ -70,10 +72,21 @@ export default function DashboardPage() {
     }
   }
 
+  function handleLogout() {
+    localStorage.removeItem("token");
+    navigate("/");
+  }
+
   return (
     <main className="app-page">
       <section className="dashboard-container">
-        <h1 className="page-title">Dashboard</h1>
+        <div className="dashboard-header">
+          <h1 className="page-title">Dashboard</h1>
+
+          <button className="secondary-button" onClick={handleLogout}>
+            Cerrar sesión
+          </button>
+        </div>
 
         <form className="habit-form" onSubmit={handleCreateHabit}>
           <div>
