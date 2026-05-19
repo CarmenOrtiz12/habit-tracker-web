@@ -6,6 +6,8 @@ import {
   createHabit,
 } from "../services/habitService";
 
+import "../App.css";
+
 type Habit = {
   id: number;
   name: string;
@@ -69,61 +71,63 @@ export default function DashboardPage() {
   }
 
   return (
-    <main>
-      <h1>Dashboard</h1>
+    <main className="app-page">
+      <section className="dashboard-container">
+        <h1 className="page-title">Dashboard</h1>
 
-      <form onSubmit={handleCreateHabit}>
-        <div>
-          <input
-            type="text"
-            placeholder="Nombre del hábito"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-          />
-        </div>
+        <form className="habit-form" onSubmit={handleCreateHabit}>
+          <div>
+            <input
+              type="text"
+              placeholder="Nombre del hábito"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+            />
+          </div>
 
-        <div>
-          <input
-            type="text"
-            placeholder="Descripción"
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
-          />
-        </div>
+          <div>
+            <input
+              type="text"
+              placeholder="Descripción"
+              value={description}
+              onChange={(event) => setDescription(event.target.value)}
+            />
+          </div>
 
-        <button type="submit">
-          Crear hábito
-        </button>
-      </form>
+          <button type="submit" className="primary-button">
+            Crear hábito
+          </button>
+        </form>
 
-      {habits.length === 0 ? (
-        <p>No tienes hábitos registrados.</p>
-      ) : (
-        <ul>
-          {habits.map((habit) => (
-            <li key={habit.id}>
-              <h3>{habit.name}</h3>
+        {habits.length === 0 ? (
+          <p>No tienes hábitos registrados.</p>
+        ) : (
+          <ul className="habit-list">
+            {habits.map((habit) => (
+              <li key={habit.id} className="habit-card">
+                <h3>{habit.name}</h3>
 
-              <p>{habit.description}</p>
+                <p>{habit.description}</p>
 
-              <p>
-                Estado:{" "}
-                {habit.completed_today
-                  ? "✅ Completado"
-                  : "❌ Pendiente"}
-              </p>
+                <p>
+                  Estado:{" "}
+                  {habit.completed_today
+                    ? "✅ Completado"
+                    : "❌ Pendiente"}
+                </p>
 
-              <p>🔥 Streak: {habit.streak}</p>
+                <p>🔥 Streak: {habit.streak}</p>
 
-              {!habit.completed_today && (
-                <button onClick={() => handleCompleteHabit(habit.id)}>
-                    Completar hoy
-                </button>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
+                {!habit.completed_today && (
+                  <button className="primary-button" onClick={() => handleCompleteHabit(habit.id)}>
+                      Completar hoy
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </main>
   );
 }
