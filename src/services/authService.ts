@@ -14,3 +14,13 @@ export async function login(email: string, password: string) {
 
   return response.data;
 }
+
+export async function register(name: string, email: string, password: string) {
+  const response = await api.post("/users", {
+    name,
+    email,
+    password,
+  });
+
+  return response.data;
+}
