@@ -96,7 +96,7 @@ export default function DashboardPage() {
   }
 
   function handleLogout() {
-    localStorage.removeItem("token");
+    localStorage.removeItem("access_token");
     navigate("/");
   }
 

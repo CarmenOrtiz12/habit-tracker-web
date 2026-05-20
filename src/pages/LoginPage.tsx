@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
 import { login } from "../services/authService";
@@ -6,9 +6,17 @@ import { login } from "../services/authService";
 export default function LoginPage() {
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("test@test.com");
-  const [password, setPassword] = useState("123456");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
+
+    if (token) {
+      navigate("/dashboard");
+    }
+  }, [navigate]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
