@@ -19,3 +19,8 @@ export async function createHabit(name: string, description: string, frequency: 
 
   return response.data;
 }
+
+export async function getHabitStats() {
+  const response = await api.get("/habits/stats");
+  return response.data;
+}

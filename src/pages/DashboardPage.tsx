@@ -5,6 +5,7 @@ import {
   getTodayHabits,
   completeHabitToday,
   createHabit,
+  getHabitStats
 } from "../services/habitService";
 
 import { getCurrentUser } from "../services/userService";
@@ -27,12 +28,19 @@ type Habit = {
   streak: number;
 };
 
+type HabitStats = {
+  total_habits: number;
+  completed_today: number;
+  pending_today: number;
+};
+
 export default function DashboardPage() {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [stats, setStats] = useState<HabitStats | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -42,10 +50,12 @@ export default function DashboardPage() {
         setUser(currentUser);
         const data = await getTodayHabits();
         setHabits(data);
+        const habitStats = await getHabitStats();
+        setStats(habitStats);
       } catch (error) {
-        console.error(error);
+          console.error(error);
       } finally {
-        setLoading(false);
+          setLoading(false);
       }
     }
 
@@ -61,6 +71,8 @@ export default function DashboardPage() {
         await completeHabitToday(habitId);
         const updatedHabits = await getTodayHabits();
         setHabits(updatedHabits);
+        const updatedStats = await getHabitStats();
+        setStats(updatedStats);
     } catch (error) {
         console.error(error);
     }
@@ -98,6 +110,25 @@ export default function DashboardPage() {
             Cerrar sesión
           </button>
         </div>
+
+        {stats && (
+          <section className="stats-grid">
+            <article className="stat-card">
+              <span>Total</span>
+              <strong>{stats.total_habits}</strong>
+            </article>
+
+            <article className="stat-card">
+              <span>Completados hoy</span>
+              <strong>{stats.completed_today}</strong>
+            </article>
+
+            <article className="stat-card">
+              <span>Pendientes</span>
+              <strong>{stats.pending_today}</strong>
+            </article>
+          </section>
+        )}
 
         <form className="habit-form" onSubmit={handleCreateHabit}>
           <div>
