@@ -23,9 +23,13 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="app-page">
-      <section className="dashboard-container">
-        <h1 className="page-title">Crear cuenta</h1>
+    <main className="auth-page">
+      <section className="auth-card">
+        <h1 className="auth-title">Crear cuenta</h1>
+
+        <p className="auth-subtitle">
+          Empieza a construir mejores hábitos desde hoy ✨
+        </p>
 
         <form className="auth-form" onSubmit={handleSubmit}>
           <input
@@ -54,7 +58,7 @@ export default function RegisterPage() {
           </button>
         </form>
 
-        <p>
+        <p className="auth-footer">
           ¿Ya tienes cuenta? <Link to="/">Iniciar sesión</Link>
         </p>
       </section>

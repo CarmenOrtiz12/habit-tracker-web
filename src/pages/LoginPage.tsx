@@ -34,37 +34,45 @@ export default function LoginPage() {
   }
 
   return (
-    <main>
-      <h1>Habit Tracker</h1>
-      <h2>Iniciar sesión</h2>
+    <main className="auth-page">
+      <section className="auth-card">
+        <h1 className="auth-title">
+          Habit Tracker
+        </h1>
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Email</label>
+        <p className="auth-subtitle">
+          Construye hábitos y mejora cada día 🚀
+        </p>
+
+        <form className="auth-form" onSubmit={handleSubmit}>
           <input
             type="email"
+            placeholder="Email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
           />
-        </div>
 
-        <div>
-          <label>Contraseña</label>
           <input
             type="password"
+            placeholder="Contraseña"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
           />
-        </div>
 
-        {error && <p>{error}</p>}
+          {error && <p>{error}</p>}
 
-        <button type="submit">Entrar</button>
-      </form>
+          <button className="primary-button" type="submit">
+            Iniciar sesión
+          </button>
+        </form>
 
-      <p>
-        ¿No tienes cuenta? <Link to="/register">Crear cuenta</Link>
-      </p>
+        <p className="auth-footer">
+          ¿No tienes cuenta?{" "}
+          <Link to="/register">
+            Crear cuenta
+          </Link>
+        </p>
+      </section>
     </main>
   );
 }

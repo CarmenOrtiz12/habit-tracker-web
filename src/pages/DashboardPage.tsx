@@ -2,6 +2,15 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+
+import {
   getTodayHabits,
   completeHabitToday,
   createHabit,
@@ -36,16 +45,34 @@ type HabitStats = {
   pending_today: number;
 };
 
-export default function DashboardPage() {
+type Props = {
+  theme: string;
+  toggleTheme: () => void;
+};
+
+export default function DashboardPage({ theme, toggleTheme }: Props) {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [stats, setStats] = useState<HabitStats | null>(null);
+  const chartData = stats
+    ? [
+        {
+          name: "Completados",
+          total: stats.completed_today,
+        },
+        {
+          name: "Pendientes",
+          total: stats.pending_today,
+        },
+      ]
+    : [];
   const [editingHabitId, setEditingHabitId] = useState<number | null>(null);
   const [editName, setEditName] = useState("");
   const [editDescription, setEditDescription] = useState("");
+  const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -67,6 +94,16 @@ export default function DashboardPage() {
     loadHabits();
   }, []);
 
+  useEffect(() => {
+    if (!message) return;
+
+    const timer = setTimeout(() => {
+      setMessage("");
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [message]);
+
   if (loading) {
     return <p>Cargando hábitos...</p>;
   }
@@ -78,6 +115,7 @@ export default function DashboardPage() {
         setHabits(updatedHabits);
         const updatedStats = await getHabitStats();
         setStats(updatedStats);
+        setMessage("Hábito completado correctamente");
     } catch (error) {
         console.error(error);
     }
@@ -93,6 +131,8 @@ export default function DashboardPage() {
       const updatedStats = await getHabitStats();
       setStats(updatedStats);
 
+      setMessage("Hábito eliminado correctamente");
+
     } catch (error) {
         console.error(error);
     }
@@ -105,10 +145,13 @@ export default function DashboardPage() {
       await createHabit(name, description, "daily");
 
       const updatedHabits = await getTodayHabits();
+      const updatedStats = await getHabitStats();
 
       setHabits(updatedHabits);
+      setStats(updatedStats);
       setName("");
       setDescription("");
+      setMessage("Hábito creado correctamente");
 
     } catch (error) {
       console.error(error);
@@ -133,6 +176,7 @@ export default function DashboardPage() {
 
       const updatedHabits = await getTodayHabits();
       setHabits(updatedHabits);
+      setMessage("Hábito actualizado correctamente");
 
       cancelEditingHabit();
     } catch (error) {
@@ -151,6 +195,10 @@ export default function DashboardPage() {
         <div className="dashboard-header">
           <h1 className="page-title">Hola, {user?.name ?? "usuario"} 👋</h1>
 
+          <button className="secondary-button" onClick={toggleTheme}>
+            {theme === "light" ? "🌙 Dark mode" : "☀️ Light mode"}
+          </button>
+          
           <button className="secondary-button" onClick={handleLogout}>
             Cerrar sesión
           </button>
@@ -174,6 +222,21 @@ export default function DashboardPage() {
             </article>
           </section>
         )}
+
+        <section className="chart-container">
+          <h2>Progreso de hoy</h2>
+
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={chartData}>
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="total" fill="#2563eb" />
+            </BarChart>
+          </ResponsiveContainer>
+        </section>
+
+        {message && <p className="feedback-message">{message}</p>}
 
         <form className="habit-form" onSubmit={handleCreateHabit}>
           <div>
@@ -232,37 +295,58 @@ export default function DashboardPage() {
                   </>
                 ) : (
                   <>
-                    <h3>{habit.name}</h3>
-                    <p>{habit.description}</p>
+                    <div className="habit-top">
+                      <div>
+                        <h3>{habit.name}</h3>
 
-                    <p className="status">
-                      Estado: {habit.completed_today ? "✅ Completado" : "❌ Pendiente"}
-                    </p>
+                        <p className="habit-description">
+                          {habit.description}
+                        </p>
+                      </div>
 
-                    <p className="streak">🔥 Streak: {habit.streak}</p>
-
-                    {!habit.completed_today && (
-                      <button
-                        className="primary-button"
-                        onClick={() => handleCompleteHabit(habit.id)}
+                      <div
+                        className={
+                          habit.completed_today
+                            ? "habit-status completed"
+                            : "habit-status pending"
+                        }
                       >
-                        Completar hoy
-                      </button>
-                    )}
+                        {habit.completed_today
+                          ? "Completado"
+                          : "Pendiente"}
+                      </div>
+                    </div>
 
-                    <button
-                      className="secondary-button"
-                      onClick={() => startEditingHabit(habit)}
-                    >
-                      Editar
-                    </button>
+                    <div className="habit-footer">
+                      <p className="streak">
+                        🔥 Streak: {habit.streak}
+                      </p>
 
-                    <button
-                      className="danger-button"
-                      onClick={() => handleDeleteHabit(habit.id)}
-                    >
-                      Eliminar
-                    </button>
+                      <div className="habit-actions">
+                        {!habit.completed_today && (
+                          <button
+                            className="primary-button"
+                            onClick={() => handleCompleteHabit(habit.id)}
+                          >
+                            Completar
+                          </button>
+                        )}
+
+                        <button
+                          className="secondary-button"
+                          onClick={() => startEditingHabit(habit)}
+                        >
+                          Editar
+                        </button>
+
+                        <button
+                          className="danger-button"
+                          onClick={() => handleDeleteHabit(habit.id)}
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </div>
                   </>
                 )}
               </li>
