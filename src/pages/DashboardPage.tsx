@@ -5,7 +5,9 @@ import {
   getTodayHabits,
   completeHabitToday,
   createHabit,
-  getHabitStats
+  getHabitStats,
+  updateHabit,
+  deleteHabit
 } from "../services/habitService";
 
 import { getCurrentUser } from "../services/userService";
@@ -41,6 +43,9 @@ export default function DashboardPage() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [stats, setStats] = useState<HabitStats | null>(null);
+  const [editingHabitId, setEditingHabitId] = useState<number | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editDescription, setEditDescription] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -78,6 +83,21 @@ export default function DashboardPage() {
     }
   }
 
+  async function handleDeleteHabit(habitId: number) {
+    try {
+      await deleteHabit(habitId);
+
+      const updatedHabits = await getTodayHabits();
+      setHabits(updatedHabits);
+
+      const updatedStats = await getHabitStats();
+      setStats(updatedStats);
+
+    } catch (error) {
+        console.error(error);
+    }
+  }
+
   async function handleCreateHabit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -92,6 +112,31 @@ export default function DashboardPage() {
 
     } catch (error) {
       console.error(error);
+    }
+  }
+
+  function startEditingHabit(habit: Habit) {
+    setEditingHabitId(habit.id);
+    setEditName(habit.name);
+    setEditDescription(habit.description ?? "");
+  }
+
+  function cancelEditingHabit() {
+    setEditingHabitId(null);
+    setEditName("");
+    setEditDescription("");
+  }
+
+  async function handleUpdateHabit(habitId: number) {
+    try {
+      await updateHabit(habitId, editName, editDescription, "daily");
+
+      const updatedHabits = await getTodayHabits();
+      setHabits(updatedHabits);
+
+      cancelEditingHabit();
+    } catch (error) {
+        console.error(error);
     }
   }
 
@@ -160,23 +205,65 @@ export default function DashboardPage() {
           <ul className="habit-list">
             {habits.map((habit) => (
               <li key={habit.id} className="habit-card">
-                <h3>{habit.name}</h3>
+                {editingHabitId === habit.id ? (
+                  <>
+                    <input
+                      type="text"
+                      value={editName}
+                      onChange={(event) => setEditName(event.target.value)}
+                    />
 
-                <p>{habit.description}</p>
+                    <input
+                      type="text"
+                      value={editDescription}
+                      onChange={(event) => setEditDescription(event.target.value)}
+                    />
 
-                <p>
-                  Estado:{" "}
-                  {habit.completed_today
-                    ? "✅ Completado"
-                    : "❌ Pendiente"}
-                </p>
+                    <button
+                      className="primary-button"
+                      onClick={() => handleUpdateHabit(habit.id)}
+                    >
+                      Guardar
+                    </button>
 
-                <p>🔥 Streak: {habit.streak}</p>
+                    <button className="secondary-button" onClick={cancelEditingHabit}>
+                      Cancelar
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <h3>{habit.name}</h3>
+                    <p>{habit.description}</p>
 
-                {!habit.completed_today && (
-                  <button className="primary-button" onClick={() => handleCompleteHabit(habit.id)}>
-                      Completar hoy
-                  </button>
+                    <p className="status">
+                      Estado: {habit.completed_today ? "✅ Completado" : "❌ Pendiente"}
+                    </p>
+
+                    <p className="streak">🔥 Streak: {habit.streak}</p>
+
+                    {!habit.completed_today && (
+                      <button
+                        className="primary-button"
+                        onClick={() => handleCompleteHabit(habit.id)}
+                      >
+                        Completar hoy
+                      </button>
+                    )}
+
+                    <button
+                      className="secondary-button"
+                      onClick={() => startEditingHabit(habit)}
+                    >
+                      Editar
+                    </button>
+
+                    <button
+                      className="danger-button"
+                      onClick={() => handleDeleteHabit(habit.id)}
+                    >
+                      Eliminar
+                    </button>
+                  </>
                 )}
               </li>
             ))}

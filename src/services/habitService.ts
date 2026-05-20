@@ -24,3 +24,17 @@ export async function getHabitStats() {
   const response = await api.get("/habits/stats");
   return response.data;
 }
+
+export async function updateHabit(habitId: number, name: string, description: string, frequency: string) {
+  const response = await api.put(`/habits/${habitId}`, {
+    name,
+    description,
+    frequency,
+  });
+
+  return response.data;
+}
+
+export async function deleteHabit(habitId: number) {
+  await api.delete(`/habits/${habitId}`);
+}
