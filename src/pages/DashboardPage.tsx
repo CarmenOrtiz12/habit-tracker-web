@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type SyntheticEvent } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -22,29 +22,9 @@ import {
 
 import { getCurrentUser } from "../services/userService";
 import "../App.css";
-
-
-type User = {
-  id: number;
-  name: string;
-  email: string;
-};
-
-type Habit = {
-  id: number;
-  name: string;
-  description: string | null;
-  frequency: string;
-  completed_today: boolean;
-  completed_date: string | null;
-  streak: number;
-};
-
-type HabitStats = {
-  total_habits: number;
-  completed_today: number;
-  pending_today: number;
-};
+import type { Habit } from "../types/habit";
+import type { User } from "../types/user";
+import type { HabitStats } from "../types/stats";
 
 type Props = {
   theme: string;
@@ -80,10 +60,11 @@ export default function DashboardPage({ theme, toggleTheme }: Props) {
     async function loadHabits() {
       try {
         const currentUser = await getCurrentUser();
-        setUser(currentUser);
         const data = await getTodayHabits();
-        setHabits(data);
         const habitStats = await getHabitStats();
+
+        setUser(currentUser);
+        setHabits(data);
         setStats(habitStats);
       } catch (error) {
           console.error(error);
@@ -112,10 +93,8 @@ export default function DashboardPage({ theme, toggleTheme }: Props) {
   async function handleCompleteHabit(habitId: number) {
     try {
         await completeHabitToday(habitId);
-        const updatedHabits = await getTodayHabits();
-        setHabits(updatedHabits);
-        const updatedStats = await getHabitStats();
-        setStats(updatedStats);
+        await refreshDashboardData();
+
         setMessage("Hábito completado correctamente");
     } catch (error) {
         console.error(error);
@@ -125,37 +104,27 @@ export default function DashboardPage({ theme, toggleTheme }: Props) {
   async function handleDeleteHabit(habitId: number) {
     try {
       await deleteHabit(habitId);
-
-      const updatedHabits = await getTodayHabits();
-      setHabits(updatedHabits);
-
-      const updatedStats = await getHabitStats();
-      setStats(updatedStats);
-
+      await refreshDashboardData();
+      
       setMessage("Hábito eliminado correctamente");
-
     } catch (error) {
         console.error(error);
     }
   }
 
-  async function handleCreateHabit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleCreateHabit(event: SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
 
     try {
       await createHabit(name, description, "daily");
+      await refreshDashboardData();
 
-      const updatedHabits = await getTodayHabits();
-      const updatedStats = await getHabitStats();
-
-      setHabits(updatedHabits);
-      setStats(updatedStats);
+      setMessage("Hábito creado correctamente");
       setName("");
       setDescription("");
-      setMessage("Hábito creado correctamente");
 
     } catch (error) {
-      console.error(error);
+        console.error(error);
     }
   }
 
@@ -174,15 +143,21 @@ export default function DashboardPage({ theme, toggleTheme }: Props) {
   async function handleUpdateHabit(habitId: number) {
     try {
       await updateHabit(habitId, editName, editDescription, "daily");
+      await refreshDashboardData();
 
-      const updatedHabits = await getTodayHabits();
-      setHabits(updatedHabits);
       setMessage("Hábito actualizado correctamente");
-
       cancelEditingHabit();
     } catch (error) {
         console.error(error);
     }
+  }
+
+  async function refreshDashboardData() {
+    const updatedHabits = await getTodayHabits();
+    const updatedStats = await getHabitStats();
+
+    setHabits(updatedHabits);
+    setStats(updatedStats);
   }
 
   function handleLogout() {

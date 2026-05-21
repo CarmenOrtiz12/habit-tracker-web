@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type SyntheticEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { register } from "../services/authService";
@@ -11,14 +11,14 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
 
     try {
       await register(name, email, password);
       navigate("/");
     } catch (error) {
-      console.error(error);
+        console.error(error);
     }
   }
 
@@ -26,10 +26,7 @@ export default function RegisterPage() {
     <main className="auth-page">
       <section className="auth-card">
         <h1 className="auth-title">Crear cuenta</h1>
-
-        <p className="auth-subtitle">
-          Empieza a construir mejores hábitos desde hoy ✨
-        </p>
+        <p className="auth-subtitle">Empieza a construir mejores hábitos desde hoy ✨</p>
 
         <form className="auth-form" onSubmit={handleSubmit}>
           <input
@@ -53,13 +50,12 @@ export default function RegisterPage() {
             onChange={(event) => setPassword(event.target.value)}
           />
 
-          <button className="primary-button" type="submit">
-            Crear cuenta
-          </button>
+          <button className="primary-button" type="submit"> Crear cuenta </button>
+
         </form>
 
-        <p className="auth-footer">
-          ¿Ya tienes cuenta? <Link to="/">Iniciar sesión</Link>
+        <p className="auth-footer"> ¿Ya tienes cuenta? 
+          <Link to="/">Iniciar sesión</Link>
         </p>
       </section>
     </main>
