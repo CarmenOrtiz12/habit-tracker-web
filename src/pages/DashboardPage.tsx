@@ -8,6 +8,7 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
+  CartesianGrid
 } from "recharts";
 
 import {
@@ -193,15 +194,17 @@ export default function DashboardPage({ theme, toggleTheme }: Props) {
     <main className="app-page">
       <section className="dashboard-container">
         <div className="dashboard-header">
-          <h1 className="page-title">Hola, {user?.name ?? "usuario"} 👋</h1>
+          <h1 className="page-title"> Hola, {user?.name ?? "usuario"} 👋 </h1>
 
-          <button className="secondary-button" onClick={toggleTheme}>
-            {theme === "light" ? "🌙 Dark mode" : "☀️ Light mode"}
-          </button>
-          
-          <button className="secondary-button" onClick={handleLogout}>
-            Cerrar sesión
-          </button>
+          <div className="header-actions">
+            <button className="secondary-button" onClick={toggleTheme}>
+              {theme === "light" ? "🌙 Dark mode" : "☀️ Light mode"}
+            </button>
+            
+            <button className="danger-outline-button" onClick={handleLogout}>
+              Cerrar sesión
+            </button>
+          </div>
         </div>
 
         {stats && (
@@ -228,99 +231,122 @@ export default function DashboardPage({ theme, toggleTheme }: Props) {
 
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={chartData}>
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="total" fill="#2563eb" />
+              <XAxis dataKey="name" stroke="var(--text-secondary)" />
+              <YAxis stroke="var(--text-secondary)" />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "var(--surface)",
+                  border: "1px solid var(--border)",
+                  borderRadius: "12px",
+                  color: "var(--text)",
+                }}
+                labelStyle={{
+                  color: "var(--text)",
+                }}
+                itemStyle={{
+                  color: "var(--text)",
+                }}
+              />
+              <Bar dataKey="total" fill="var(--primary)" />
+              <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" />
             </BarChart>
           </ResponsiveContainer>
         </section>
 
         {message && <p className="feedback-message">{message}</p>}
 
-        <form className="habit-form" onSubmit={handleCreateHabit}>
-          <div>
-            <input
-              type="text"
-              placeholder="Nombre del hábito"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-            />
+        <section className="habits-panel">
+          <div className="habits-panel-header">
+            <div>
+              <h2>Mis hábitos</h2>
+              <p>Administra tus hábitos diarios</p>
+            </div>
+
+            <form className="habit-form compact" onSubmit={handleCreateHabit}>
+              <input
+                type="text"
+                placeholder="Nombre del hábito"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+              />
+
+              <input
+                type="text"
+                placeholder="Descripción"
+                value={description}
+                onChange={(event) => setDescription(event.target.value)}
+              />
+
+              <button className="primary-button" type="submit">
+                + Agregar hábito
+              </button>
+            </form>
           </div>
 
-          <div>
-            <input
-              type="text"
-              placeholder="Descripción"
-              value={description}
-              onChange={(event) => setDescription(event.target.value)}
-            />
-          </div>
+          {habits.length === 0 ? (
+            <p>No tienes hábitos registrados.</p>
+          ) : (
+            <ul className="habit-table-list">
+              {habits.map((habit) => (
+                <li className="habit-row" key={habit.id}>
+                  {editingHabitId === habit.id ? (
+                    <>
+                      <div className="edit-row-content">
+                        <input
+                          type="text"
+                          value={editName}
+                          onChange={(event) => setEditName(event.target.value)}
+                        />
 
-          <button type="submit" className="primary-button">
-            Crear hábito
-          </button>
-        </form>
+                        <input
+                          type="text"
+                          value={editDescription}
+                          onChange={(event) => setEditDescription(event.target.value)}
+                        />
 
-        {habits.length === 0 ? (
-          <p>No tienes hábitos registrados.</p>
-        ) : (
-          <ul className="habit-list">
-            {habits.map((habit) => (
-              <li key={habit.id} className="habit-card">
-                {editingHabitId === habit.id ? (
-                  <>
-                    <input
-                      type="text"
-                      value={editName}
-                      onChange={(event) => setEditName(event.target.value)}
-                    />
+                        <div className="habit-actions">
+                          <button
+                            className="primary-button"
+                            onClick={() => handleUpdateHabit(habit.id)}
+                          >
+                            Guardar
+                          </button>
 
-                    <input
-                      type="text"
-                      value={editDescription}
-                      onChange={(event) => setEditDescription(event.target.value)}
-                    />
+                          <button className="secondary-button" onClick={cancelEditingHabit}>
+                            Cancelar
+                          </button>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="habit-row-main">
+                        <div
+                          className={
+                            habit.completed_today
+                              ? "habit-check completed"
+                              : "habit-check pending"
+                          }
+                        >
+                          {habit.completed_today ? "✓" : ""}
+                        </div>
 
-                    <button
-                      className="primary-button"
-                      onClick={() => handleUpdateHabit(habit.id)}
-                    >
-                      Guardar
-                    </button>
-
-                    <button className="secondary-button" onClick={cancelEditingHabit}>
-                      Cancelar
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <div className="habit-top">
-                      <div>
-                        <h3>{habit.name}</h3>
-
-                        <p className="habit-description">
-                          {habit.description}
-                        </p>
+                        <div>
+                          <h3>{habit.name}</h3>
+                          <p>{habit.description}</p>
+                          <small>🔥 Streak: {habit.streak}</small>
+                        </div>
                       </div>
 
-                      <div
+                      <span
                         className={
                           habit.completed_today
                             ? "habit-status completed"
                             : "habit-status pending"
                         }
                       >
-                        {habit.completed_today
-                          ? "Completado"
-                          : "Pendiente"}
-                      </div>
-                    </div>
-
-                    <div className="habit-footer">
-                      <p className="streak">
-                        🔥 Streak: {habit.streak}
-                      </p>
+                        {habit.completed_today ? "Completado hoy" : "Pendiente"}
+                      </span>
 
                       <div className="habit-actions">
                         {!habit.completed_today && (
@@ -333,26 +359,26 @@ export default function DashboardPage({ theme, toggleTheme }: Props) {
                         )}
 
                         <button
-                          className="secondary-button"
+                          className="secondary-button icon-button"
                           onClick={() => startEditingHabit(habit)}
                         >
-                          Editar
+                          ✎
                         </button>
 
                         <button
-                          className="danger-button"
+                          className="danger-button icon-button"
                           onClick={() => handleDeleteHabit(habit.id)}
                         >
-                          Eliminar
+                          🗑
                         </button>
                       </div>
-                    </div>
-                  </>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
+                    </>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
       </section>
     </main>
   );
