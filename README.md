@@ -1,73 +1,79 @@
-# React + TypeScript + Vite
+# Habit Tracker 🚀
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend application for a fullstack Habit Tracker project built with **React**, **TypeScript**, **Vite**, **Axios**, and **Recharts**.
 
-Currently, two official plugins are available:
+This app connects to the Habit Tracker API and provides a modern dashboard to manage daily habits, track progress, view statistics, and use dark mode.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## ✨ Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- 🔐 Login and register flows
+- 🧭 Protected routes
+- 🔑 JWT token handling
+- ✅ Create, update, delete habits
+- 📅 Complete habits for today
+- 🔥 Streak display
+- 📊 Dashboard statistics
+- 📈 Progress chart with Recharts
+- 🌙 Dark mode / light mode
+- 📱 Responsive design
+- ⚡ SPA experience with React Router
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🛠 Tech Stack
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- React
+- TypeScript
+- Vite
+- Axios
+- React Router
+- Recharts
+- CSS
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+---
+
+## 🚀 Getting Started
+
+## 1. Clone the repositoriy
+
+```bash
+git clone https://github.com/CarmenOrtiz12/habit-tracker-web.git
+cd habit-tracker-web
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 2. Install dependencies
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
+
+## 3. Create `.env` file:
+
+```env
+VITE_API_URL=http://localhost:8000
+```
+
+## 4. Run development server:
+
+```bash
+npm run dev
+```
+
+Frontend available at: http://localhost:5173
+
+----
+
+## 🔗 Backend API
+
+This frontend requires the Habit Tracker API running locally or deployed.
+
+Local backend URL: http://localhost:8000
+
+---
+
+## 👨‍💻 Author
+
+Built by María Del Carmen Ortiz Garcia.
