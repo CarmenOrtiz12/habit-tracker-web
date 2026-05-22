@@ -25,3 +25,9 @@ dist-ssr
 
 # Sensitive files
 .env
+
+# Testing
+coverage/
+
+# Vercel
+.vercel
